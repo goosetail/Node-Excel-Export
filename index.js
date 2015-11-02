@@ -51,6 +51,9 @@ exports.execute = function(config){
     }
   }
 
+	shareStrings = new SortedMap();
+	convertedShareStrings = "";
+
 	//add "meta" data above tabular data
 	var addMeta = function(meta){
 
@@ -70,8 +73,6 @@ exports.execute = function(config){
 		addMeta(meta);
 	}
 
-	shareStrings = new SortedMap();
-  convertedShareStrings = "";
 	//first row for column caption
 	row = '<x:row r="'+rowIndex+'" spans="1:'+ colsLength + '">';
   var colStyleIndex;

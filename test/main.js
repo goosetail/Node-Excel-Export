@@ -7,6 +7,9 @@ describe('Simple Excel xlsx Export', function() {
     describe('Export', function() {
         it('returns xlsx', function() {
 		var conf ={};
+		conf.meta = [
+			['Report Title:','Test Report']
+		];
 		conf.cols = [
 			{caption:'string', type:'string'},
 			{caption:'date', type:'date'},
