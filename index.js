@@ -52,6 +52,20 @@ exports.execute = function(config){
   }
 
 	//add "meta" data above tabular data
+	var addMeta = function(meta){
+
+		for (var i= 0, j= meta.length; i<j; i++) {
+			row = '<x:row r="'+rowIndex+'" spans="1:'+ colsLength + '">';
+			for (var k= 0, l=meta[i].length; k<l; k++) {
+				row += addStringCol(getColumnLetter(k+1)+1, cols[k].caption, colStyleIndex);
+			}
+			row += '</x:row>';
+			rows += row;
+			rowIndex++;
+		}
+
+	};
+
 	if (meta) {
 		addMeta(meta);
 	}
@@ -201,18 +215,4 @@ var getColumnLetter = function(col){
 	array.push(64 + remainder);
   }
   return String.fromCharCode.apply(null, array.reverse());
-};
-
-var addMeta = function(meta){
-
-	for (var i= 0, j= meta.length; i<j; i++) {
-		row = '<x:row r="'+rowIndex+'" spans="1:'+ colsLength + '">';
-		for (var k= 0, l=meta[i].length; k<l; k++) {
-			row += addStringCol(getColumnLetter(k+1)+1, cols[k].caption, colStyleIndex);
-		}
-		row += '</x:row>';
-		rows += row;
-		rowIndex++;
-	}
-
 };
