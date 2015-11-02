@@ -30,12 +30,14 @@ exports.executeAsync = function(config, callBack){
 exports.execute = function(config){
 	var cols = config.cols,
 		data = config.rows,
+		meta = config.meta,
     colsLength = cols.length,
 	  xlsx = new JSZip(templateXLSX, { base64: true, checkCRC32: false }),
 		sheet = xlsx.file("xl/worksheets/sheet.xml"),
 		sharedStringsXml = xlsx.file("xl/sharedStrings.xml"),
 		rows = "",
 		row ="",
+		rowIndex = 1,
     colsWidth = "",
     styleIndex,
     k;
@@ -48,11 +50,16 @@ exports.execute = function(config){
       xlsx.file("xl/styles.xml", styles);
     }
   }
-  
+
+	//add "meta" data above tabular data
+	if (meta) {
+		addMeta(meta);
+	}
+
 	shareStrings = new SortedMap();
   convertedShareStrings = "";
 	//first row for column caption
-	row = '<x:row r="1" spans="1:'+ colsLength + '">';
+	row = '<x:row r="'+rowIndex+'" spans="1:'+ colsLength + '">';
   var colStyleIndex;
 	for (k=0; k < colsLength; k++)
 	{
@@ -71,7 +78,7 @@ exports.execute = function(config){
     
 	for (i=0;i<dataLength;i++)
 	{
-		r = data[i], currRow = i+2;
+		r = data[i], currRow = i+rowIndex;
 		row = '<x:row r="' + currRow +'" spans="1:'+ colsLength + '">';
 		for (j=0; j < colsLength; j++)
 		{
@@ -194,4 +201,18 @@ var getColumnLetter = function(col){
 	array.push(64 + remainder);
   }
   return String.fromCharCode.apply(null, array.reverse());
+};
+
+var addMeta = function(meta){
+
+	for (var i= 0, j= meta.length; i<j; i++) {
+		row = '<x:row r="'+rowIndex+'" spans="1:'+ colsLength + '">';
+		for (var k= 0, l=meta[i].length; k<l; k++) {
+			row += addStringCol(getColumnLetter(k+1)+1, cols[k].caption, colStyleIndex);
+		}
+		row += '</x:row>';
+		rows += row;
+		rowIndex++;
+	}
+
 };
