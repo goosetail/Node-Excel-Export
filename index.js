@@ -54,23 +54,37 @@ exports.execute = function(config){
 	shareStrings = new SortedMap();
 	convertedShareStrings = "";
 
-	//add "meta" data above tabular data
-	var addMeta = function(meta){
+	//create rows for "meta" data
+	var getMetaRows = function(meta){
+
+		var sMeta = '';
 
 		for (var i= 0, j= meta.length; i<j; i++) {
-			row = '<x:row r="'+rowIndex+'" spans="1:'+ colsLength + '">';
-			for (var k= 0, l=meta[i].length; k<l; k++) {
-				row += addStringCol(getColumnLetter(k+1)+1, cols[k].caption, colStyleIndex);
+
+			var meta_cols = meta[i];
+
+			while (meta_cols.length < colsLength) {
+				meta_cols.push(null);
+			};
+
+			row = '<x:row r="'+rowIndex+'" spans="1:'+meta_cols.length+'">';
+
+			for (var k= 0, l=colsLength; k<l; k++) {
+				var col = addStringCol(getColumnLetter(k+1)+rowIndex, meta_cols[k], null);
+				row += col;
 			}
 			row += '</x:row>';
-			rows += row;
+			sMeta += row;
 			rowIndex++;
 		}
 
+		return sMeta;
+
 	};
 
+	// add
 	if (meta) {
-		addMeta(meta);
+		rows += getMetaRows(meta);
 	}
 
 	//first row for column caption
@@ -79,21 +93,22 @@ exports.execute = function(config){
 	for (k=0; k < colsLength; k++)
 	{
     colStyleIndex = cols[k].captionStyleIndex || 0;
-		row += addStringCol(getColumnLetter(k+1)+1, cols[k].caption, colStyleIndex);
+		row += addStringCol(getColumnLetter(k+1)+rowIndex, cols[k].caption, colStyleIndex);
     if (cols[k].width){
       colsWidth += '<col customWidth = "1" width="' + cols[k].width + '" max = "' + (k+1) +'" min="' + (k+1) +'"/>';
     }
 	}
 	row += '</x:row>';
-	rows += row;	
-	
+	rows += row;
+	rowIndex++;
+
 	//fill in data
   var i, j, r, cellData, currRow, cellType,
     dataLength = data.length;
     
 	for (i=0;i<dataLength;i++)
 	{
-		r = data[i], currRow = i+rowIndex;
+		r = data[i], currRow = rowIndex;
 		row = '<x:row r="' + currRow +'" spans="1:'+ colsLength + '">';
 		for (j=0; j < colsLength; j++)
 		{
@@ -124,6 +139,7 @@ exports.execute = function(config){
 		}
 		row += '</x:row>';
 		rows += row;
+		rowIndex++;
 	}	
   if (colsWidth !== "")
     sheetFront += '<cols>'+colsWidth+'</cols>';
